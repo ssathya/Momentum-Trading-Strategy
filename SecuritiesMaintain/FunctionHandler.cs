@@ -31,20 +31,39 @@ internal class FunctionHandler
         List<IndexComponent>? extractResult = await buildSnPLst.GetListAsync();
         if (extractResult == null)
         {
-            logger?.LogError("Extracting data failed");
+            logger?.LogError("Extracting data for S&P 500 failed");
+            extractResult = [];
         }
-        //foreach (var ic in extractResult!)
-        //{
-        //    logger?.LogInformation($"Ticker -> {ic.Ticker}\n" +
-        //        $"Company ->{ic.CompanyName}\n" +
-        //        $"Sector ->{ic.Sector}\n" +
-        //        $"Sub Sector ->{ic.SubSector}");
-        //}
+        IBuildNasdaqLst? buildNasdaqLst = provider.GetService<IBuildNasdaqLst>();
+        if (buildNasdaqLst is null)
+        {
+            logger?.LogError("Could not generate object of type IBuildNasdaqLst");
+            return;
+        }
+        List<IndexComponent>? extractResult2 = await buildNasdaqLst.GetListAsync();
+        if (extractResult2 is null)
+        {
+            logger?.LogError("Extracting data for Nasdaq failed");
+            extractResult2 = [];
+        }
+        foreach (var item in extractResult2)
+        {
+            IndexComponent? existingTicker = extractResult.FirstOrDefault(x => x.Ticker == item.Ticker);
+            if (existingTicker is null)
+            {
+                extractResult.Add(item);
+            }
+            else
+            {
+                existingTicker.ListedIndexes |= IndexNames.Nasdaq;
+            }
+        }
     }
 
     private static void AppSpecificSettings(IServiceCollection services)
     {
         services.AddScoped<IBuildSnPLst, BuildSnPLst>();
+        services.AddScoped<IBuildNasdaqLst, BuildNasdaqLst>();
     }
 
     private static void ConnectToDb(IServiceCollection services)
