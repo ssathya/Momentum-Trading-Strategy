@@ -16,10 +16,6 @@ internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst>
 
     public async Task<List<IndexComponent>?> GetListAsync()
     {
-        /*
-         * SecuritiesMaintain:Nasdaq100URL
-         * SecuritiesMaintain:Dow30URL
-         */
         List<IndexComponent>? extractedValues = [];
         string? url = configuration.GetValue<string>("SecuritiesMaintain:Nasdaq100URL");
         if (url is null)

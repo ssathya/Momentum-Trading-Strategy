@@ -23,40 +23,46 @@ internal class FunctionHandler
         Console.WriteLine("Application setup complete!");
         logger = provider.GetService<ILogger<FunctionHandler>>();
         IBuildSnPLst? buildSnPLst = provider.GetService<IBuildSnPLst>();
-        if (buildSnPLst is null)
+        IBuildNasdaqLst? buildNasdaqLst = provider.GetService<IBuildNasdaqLst>();
+        IBuildDowLst? buildDowLst = provider.GetService<IBuildDowLst>();
+        if (buildSnPLst is null || buildDowLst is null || buildNasdaqLst is null)
         {
-            logger?.LogError("Could not generate object of type IBuildSnPLst");
+            logger?.LogError("Could not generate object of type IBuildSnPLst or IBuildDowLst or IBuildNasdaqLst");
             return;
         }
         List<IndexComponent>? extractResult = await buildSnPLst.GetListAsync();
-        if (extractResult == null)
+        List<IndexComponent>? extractResult2 = await buildNasdaqLst.GetListAsync();
+        List<IndexComponent>? extractResult3 = await buildDowLst.GetListAsync();
+        Task.WaitAll();
+        if (extractResult is null || extractResult2 is null || extractResult3 is null)
         {
-            logger?.LogError("Extracting data for S&P 500 failed");
-            extractResult = [];
-        }
-        IBuildNasdaqLst? buildNasdaqLst = provider.GetService<IBuildNasdaqLst>();
-        if (buildNasdaqLst is null)
-        {
-            logger?.LogError("Could not generate object of type IBuildNasdaqLst");
+            logger?.LogError("Extracting data for S&P 500 or Nasdaq or Dow failed");
             return;
         }
-        List<IndexComponent>? extractResult2 = await buildNasdaqLst.GetListAsync();
-        if (extractResult2 is null)
+
+        foreach (var (item, existingTicker) in from item in extractResult2
+                                               let existingTicker = extractResult.FirstOrDefault(x => x.Ticker == item.Ticker)
+                                               select (item, existingTicker))
         {
-            logger?.LogError("Extracting data for Nasdaq failed");
-            extractResult2 = [];
+            AddIndexElementToExtractResult(extractResult, existingTicker, item, IndexNames.Nasdaq);
         }
-        foreach (var item in extractResult2)
+        foreach (var (item, existingTicker) in from item in extractResult3
+                                               let existingTicker = extractResult.FirstOrDefault(x => x.Ticker == item.Ticker)
+                                               select (item, existingTicker))
         {
-            IndexComponent? existingTicker = extractResult.FirstOrDefault(x => x.Ticker == item.Ticker);
-            if (existingTicker is null)
-            {
-                extractResult.Add(item);
-            }
-            else
-            {
-                existingTicker.ListedIndexes |= IndexNames.Nasdaq;
-            }
+            AddIndexElementToExtractResult(extractResult, existingTicker, item, IndexNames.Dow);
+        }
+    }
+
+    private static void AddIndexElementToExtractResult(List<IndexComponent> extractResult, IndexComponent existingTicker, IndexComponent item, IndexNames indexName)
+    {
+        if (existingTicker is null)
+        {
+            extractResult.Add(item);
+        }
+        else
+        {
+            existingTicker.ListedIndexes |= indexName;
         }
     }
 
@@ -64,6 +70,7 @@ internal class FunctionHandler
     {
         services.AddScoped<IBuildSnPLst, BuildSnPLst>();
         services.AddScoped<IBuildNasdaqLst, BuildNasdaqLst>();
+        services.AddScoped<IBuildDowLst, BuildDowLst>();
     }
 
     private static void ConnectToDb(IServiceCollection services)
