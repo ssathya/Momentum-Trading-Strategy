@@ -5,4 +5,3 @@ Console.WriteLine("Hello, World!");
 var fh = new FunctionHandler();
 await fh.DoApplicationProcessingAsync();
 Console.WriteLine("Done");
-Console.ReadKey();
