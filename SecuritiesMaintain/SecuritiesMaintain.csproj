@@ -12,6 +12,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Z.BulkOperations" Version="5.1.0" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="8.102.1.1" />
   </ItemGroup>
 
   <ItemGroup>

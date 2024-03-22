@@ -3,5 +3,6 @@ using SecuritiesMaintain;
 
 Console.WriteLine("Hello, World!");
 var fh = new FunctionHandler();
-await fh.DoApplicationProcessingAsync();
+var indexComponents = await fh.DoApplicationProcessingAsync();
+Console.WriteLine($"Convering {indexComponents?.Count} firms");
 Console.WriteLine("Done");

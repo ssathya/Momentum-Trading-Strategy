@@ -33,6 +33,8 @@ public class IndexComponent
     [Range(0, 100)]
     public float DowWeight { get; set; }
 
+    public DateTime? LastUpdated { get; set; }
+
     public void CleanUpValues()
     {
         const string Ampersand = @"&";

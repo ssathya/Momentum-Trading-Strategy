@@ -17,10 +17,18 @@ public static class ServiceHandler
         Configuration = BuildConfiguration();
         services.AddSingleton<IConfiguration>(_ => Configuration!);
         services.AddScoped<HttpClient>();
+        //Setup db connection
+        //SetupDatabaseConnection(services, Configuration);
         //string? value = Configuration?.GetValue<string>(applicationName);
         //Logger
         SetupLogger(services, Configuration!, applicationName);
         return services;
+    }
+
+    public static IConfiguration GetConfiguration()
+    {
+        Configuration ??= BuildConfiguration();
+        return Configuration!;
     }
 
     private static IConfiguration? BuildConfiguration()
@@ -46,12 +54,20 @@ public static class ServiceHandler
         return Configuration;
     }
 
-    public static IConfiguration GetConfiguration()
-    {
-        Configuration ??= BuildConfiguration();
-        return Configuration!;
-    }
-
+    //private static void SetupDatabaseConnection(IServiceCollection services, IConfiguration? configuration)
+    //{
+    //    string? connectionString = configuration?.GetValue<string>("SecuritiesMaintain:ConnectionString");
+    //    if (connectionString is null)
+    //    {
+    //        Console.WriteLine("Unable to get connection string");
+    //        return;
+    //    }
+    //    services.AddDbContextFactory<AppDbContext>(options =>
+    //    {
+    //        options.UseSqlServer(connectionString);
+    //    });
+    //    return;
+    //}
     private static void SetupLogger(IServiceCollection services, IConfiguration configuration, string applicationName)
     {
         StringBuilder filePath = new();
