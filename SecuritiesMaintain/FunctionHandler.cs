@@ -13,7 +13,7 @@ internal class FunctionHandler
     private const string ApplicationName = "SecuritiesMaintain";
     private ILogger<FunctionHandler>? logger;
 
-    internal async Task DoApplicationProcessingAsync()
+    internal async Task<List<IndexComponent>?> DoApplicationProcessingAsync()
     {
         Console.WriteLine("Setting up application");
         IServiceCollection services = ServiceHandler.ConfigureServices(ApplicationName);
@@ -22,13 +22,14 @@ internal class FunctionHandler
         ServiceProvider provider = services.BuildServiceProvider();
         Console.WriteLine("Application setup complete!");
         logger = provider.GetService<ILogger<FunctionHandler>>();
-        IBuildSnPLst? buildSnPLst = provider.GetService<IBuildSnPLst>();
-        IBuildNasdaqLst? buildNasdaqLst = provider.GetService<IBuildNasdaqLst>();
-        IBuildDowLst? buildDowLst = provider.GetService<IBuildDowLst>();
+        GetFetchObjects(provider
+            , out IBuildSnPLst? buildSnPLst
+            , out IBuildNasdaqLst? buildNasdaqLst
+            , out IBuildDowLst? buildDowLst);
         if (buildSnPLst is null || buildDowLst is null || buildNasdaqLst is null)
         {
             logger?.LogError("Could not generate object of type IBuildSnPLst or IBuildDowLst or IBuildNasdaqLst");
-            return;
+            return null;
         }
         List<IndexComponent>? extractResult = await buildSnPLst.GetListAsync();
         List<IndexComponent>? extractResult2 = await buildNasdaqLst.GetListAsync();
@@ -37,9 +38,23 @@ internal class FunctionHandler
         if (extractResult is null || extractResult2 is null || extractResult3 is null)
         {
             logger?.LogError("Extracting data for S&P 500 or Nasdaq or Dow failed");
-            return;
+            return null;
         }
 
+        MergeExtracts(extractResult, extractResult2, extractResult3);
+        IIndexToDbService? indexToDbService = provider.GetService<IIndexToDbService>();
+        if (indexToDbService is not null)
+        {
+            await indexToDbService.UpdateIndexList(extractResult);
+            await indexToDbService.DeleteAgedRecords();
+        }
+        return extractResult;
+    }
+
+    private static void MergeExtracts(List<IndexComponent> extractResult
+        , List<IndexComponent> extractResult2
+        , List<IndexComponent> extractResult3)
+    {
         foreach (var (item, existingTicker) in from item in extractResult2
                                                let existingTicker = extractResult.FirstOrDefault(x => x.Ticker == item.Ticker)
                                                select (item, existingTicker))
@@ -52,6 +67,17 @@ internal class FunctionHandler
         {
             AddIndexElementToExtractResult(extractResult, existingTicker, item, IndexNames.Dow);
         }
+        foreach (var extractResultItem in extractResult)
+        {
+            extractResultItem.LastUpdated = DateTime.UtcNow.Date;
+        }
+    }
+
+    private static void GetFetchObjects(ServiceProvider provider, out IBuildSnPLst? buildSnPLst, out IBuildNasdaqLst? buildNasdaqLst, out IBuildDowLst? buildDowLst)
+    {
+        buildSnPLst = provider.GetService<IBuildSnPLst>();
+        buildNasdaqLst = provider.GetService<IBuildNasdaqLst>();
+        buildDowLst = provider.GetService<IBuildDowLst>();
     }
 
     private static void AddIndexElementToExtractResult(List<IndexComponent> extractResult, IndexComponent existingTicker, IndexComponent item, IndexNames indexName)
@@ -71,6 +97,7 @@ internal class FunctionHandler
         services.AddScoped<IBuildSnPLst, BuildSnPLst>();
         services.AddScoped<IBuildNasdaqLst, BuildNasdaqLst>();
         services.AddScoped<IBuildDowLst, BuildDowLst>();
+        services.AddScoped<IIndexToDbService, IndexToDbService>();
     }
 
     private static void ConnectToDb(IServiceCollection services)
