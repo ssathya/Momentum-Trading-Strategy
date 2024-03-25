@@ -81,7 +81,7 @@ internal class ManageIndexWeights(IConfiguration configuration, ILogger<ManageIn
             bool extractResult = ExtractDataFromNode(out string? ticker, out float indexWeight, node);
             if (!string.IsNullOrEmpty(ticker))
             {
-                var index = indices.FirstOrDefault(x => x.Ticker == ticker || x.Ticker == ticker.Replace('-', '.'));
+                var index = indices.FirstOrDefault(x => x.Ticker == ticker || x.Ticker == ticker.Replace('.', '-'));
                 if (index != null)
                 {
                     switch (indexName)
