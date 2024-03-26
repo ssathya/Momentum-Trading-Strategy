@@ -111,7 +111,15 @@ internal class FunctionHandler
     private static void ConnectToDb(IServiceCollection services)
     {
         IConfiguration configuration = ServiceHandler.GetConfiguration();
-        string? connectionStr = configuration["SecuritiesMaintain:ConnectionString"];
+        string? connectionStrCombined = configuration["SecuritiesMaintain:ConnectionString"];
+        if (string.IsNullOrEmpty(connectionStrCombined))
+        {
+            Console.WriteLine("Unable to get connection strings");
+            return;
+        }
+        string[] connectionStrs = connectionStrCombined.Split('|');
+        string connectionStr = Environment.MachineName.Contains("-DELL", StringComparison.InvariantCultureIgnoreCase) ? connectionStrs[1] ?? "" : connectionStrs[0] ?? "";
+
         if (!string.IsNullOrEmpty(connectionStr))
             services.AddDbContextFactory<AppDbContext>(options =>
             {
