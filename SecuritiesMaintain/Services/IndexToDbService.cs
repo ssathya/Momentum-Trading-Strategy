@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCore.BulkExtensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Models;
+using Models.Extensions;
 
 namespace SecuritiesMaintain.Services;
 
@@ -26,6 +28,21 @@ internal class IndexToDbService(ILogger<IndexToDbService> logger, IDbContextFact
         return true;
     }
 
+    public async Task<int> SelectCurrentIndexCountAsync()
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            var icInDbCount = await context.IndexComponents.CountAsync();
+            return icInDbCount;
+        }
+        catch (Exception)
+        {
+            logger.LogWarning("Database should have timed out");
+            return 0;
+        }
+    }
+
     public async Task<bool> UpdateIndexList(List<IndexComponent>? indexComponents)
     {
         if (indexComponents == null || indexComponents.Count == 0)
@@ -35,10 +52,29 @@ internal class IndexToDbService(ILogger<IndexToDbService> logger, IDbContextFact
         using var context = await contextFactory.CreateDbContextAsync();
         try
         {
-            await context.BulkMergeAsync(indexComponents, options =>
+            var icInDb = await context.IndexComponents.AsNoTracking().ToListAsync();
+            foreach (IndexComponent component1 in icInDb)
             {
-                options.ColumnPrimaryKeyExpression = x => x.Ticker;
-            });
+                component1.DowWeight = 0;
+                component1.NasdaqWeight = 0;
+                component1.SnPWeight = 0;
+            }
+
+            foreach (var (component, existingRecord) in from IndexComponent component in indexComponents
+                                                        let existingRecord = icInDb.FirstOrDefault(x => x.Ticker == component.Ticker)
+                                                        select (component, existingRecord))
+            {
+                if (existingRecord == null)
+                {
+                    icInDb.Add(component);
+                }
+                else
+                {
+                    existingRecord.SetNewValues(component);
+                }
+            }
+
+            await context.BulkInsertOrUpdateAsync(icInDb);
         }
         catch (Exception ex)
         {
