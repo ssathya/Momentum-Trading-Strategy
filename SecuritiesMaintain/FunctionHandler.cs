@@ -52,6 +52,7 @@ internal class FunctionHandler
         IIndexToDbService? indexToDbService = provider.GetService<IIndexToDbService>();
         if (indexToDbService is not null)
         {
+            _ = await indexToDbService.SelectCurrentIndexCountAsync();
             await indexToDbService.UpdateIndexList(extractResult);
             await indexToDbService.DeleteAgedRecords();
         }
