@@ -1,6 +1,4 @@
 ﻿using AppCommon;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Models;
@@ -18,7 +16,7 @@ internal class FunctionHandler
         Console.WriteLine("Setting up application");
         IServiceCollection services = ServiceHandler.ConfigureServices(ApplicationName);
         AppSpecificSettings(services);
-        ConnectToDb(services);
+        ServiceHandler.ConnectToDb(services);
         ServiceProvider provider = services.BuildServiceProvider();
         Console.WriteLine("Application setup complete!");
         logger = provider.GetService<ILogger<FunctionHandler>>();
@@ -107,26 +105,5 @@ internal class FunctionHandler
         services.AddScoped<IBuildDowLst, BuildDowLst>();
         services.AddScoped<IIndexToDbService, IndexToDbService>();
         services.AddScoped<IManageIndexWeights, ManageIndexWeights>();
-    }
-
-    private static void ConnectToDb(IServiceCollection services)
-    {
-        IConfiguration configuration = ServiceHandler.GetConfiguration();
-        string? connectionStrCombined = configuration["SecuritiesMaintain:ConnectionString"];
-        if (string.IsNullOrEmpty(connectionStrCombined))
-        {
-            Console.WriteLine("Unable to get connection strings");
-            return;
-        }
-        string[] connectionStrs = connectionStrCombined.Split('|');
-        string connectionStr = Environment.MachineName.Contains("-DELL", StringComparison.InvariantCultureIgnoreCase) ? connectionStrs[1] ?? "" : connectionStrs[0] ?? "";
-
-        if (!string.IsNullOrEmpty(connectionStr))
-            services.AddDbContextFactory<AppDbContext>(options =>
-            {
-                options.UseSqlServer(connectionStr);
-            });
-        else
-            Console.WriteLine("Unable to get connection string");
     }
 }
