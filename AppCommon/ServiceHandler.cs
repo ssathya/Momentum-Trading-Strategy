@@ -1,7 +1,9 @@
 ﻿using Azure.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Models;
 using Serilog;
 using System.Text;
 
@@ -54,20 +56,6 @@ public static class ServiceHandler
         return Configuration;
     }
 
-    //private static void SetupDatabaseConnection(IServiceCollection services, IConfiguration? configuration)
-    //{
-    //    string? connectionString = configuration?.GetValue<string>("SecuritiesMaintain:ConnectionString");
-    //    if (connectionString is null)
-    //    {
-    //        Console.WriteLine("Unable to get connection string");
-    //        return;
-    //    }
-    //    services.AddDbContextFactory<AppDbContext>(options =>
-    //    {
-    //        options.UseSqlServer(connectionString);
-    //    });
-    //    return;
-    //}
     private static void SetupLogger(IServiceCollection services, IConfiguration configuration, string applicationName)
     {
         StringBuilder filePath = new();
@@ -87,5 +75,34 @@ public static class ServiceHandler
             c.AddSerilog(Log.Logger);
         });
         Log.Logger.Information("Application starting...");
+    }
+
+    public static void ConnectToDb(IServiceCollection services)
+    {
+        IConfiguration configuration = ServiceHandler.GetConfiguration();
+        string? connectionStrCombined = configuration["SecuritiesMaintain:ConnectionString"];
+        if (string.IsNullOrEmpty(connectionStrCombined))
+        {
+            Console.WriteLine("Unable to get connection strings");
+            return;
+        }
+        string[] connectionStrs = connectionStrCombined.Split('|');
+        string connectionStr = Environment.MachineName.Contains("-DELL", StringComparison.InvariantCultureIgnoreCase) ? connectionStrs[1] ?? "" : connectionStrs[0] ?? "";
+
+        if (!string.IsNullOrEmpty(connectionStr))
+            services.AddDbContextFactory<AppDbContext>(options =>
+            {
+                options.UseSqlServer(connectionStr,
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 10,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null
+                            );
+                    });
+            });
+        else
+            Console.WriteLine("Unable to get connection string");
     }
 }
