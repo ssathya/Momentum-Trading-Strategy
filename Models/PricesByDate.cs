@@ -11,7 +11,7 @@ public class PriceByDate
     public int Id { get; set; }
 
     [MaxLength(8), Required]
-    public string? Ticker { get; set; }
+    public string Ticker { get; set; } = string.Empty;
 
     public DateTime Date { get; set; }
     public double Open { get; set; }
