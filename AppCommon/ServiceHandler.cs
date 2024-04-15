@@ -92,15 +92,7 @@ public static class ServiceHandler
         if (!string.IsNullOrEmpty(connectionStr))
             services.AddDbContextFactory<AppDbContext>(options =>
             {
-                options.UseSqlServer(connectionStr,
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 10,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: null
-                            );
-                    });
+                options.UseNpgsql(connectionStr);
             });
         else
             Console.WriteLine("Unable to get connection string");

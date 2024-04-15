@@ -26,7 +26,7 @@ public class PriceByDate
         return new PriceByDate
         {
             Ticker = ticker,
-            Date = historicalData.Date,
+            Date = historicalData.Date.ToUniversalTime().Date,
             Open = historicalData.Open,
             High = historicalData.High,
             Low = historicalData.Low,

@@ -22,7 +22,7 @@ public class IndexComponent
     public string? SubSector { get; set; }
 
     [MaxLength(8), Required]
-    public string? Ticker { get; set; }
+    public string Ticker { get; set; } = string.Empty;
 
     [Range(0, 100)]
     public float SnPWeight { get; set; }
