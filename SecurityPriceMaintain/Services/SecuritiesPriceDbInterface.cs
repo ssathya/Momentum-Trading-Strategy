@@ -8,8 +8,49 @@ namespace SecurityPriceMaintain.Services;
 internal class SecuritiesPriceDbInterface(ILogger<SecuritiesPriceDbInterface> logger,
     IDbContextFactory<AppDbContext> contextFactory)
 {
-    private readonly ILogger<SecuritiesPriceDbInterface> logger = logger;
     private readonly IDbContextFactory<AppDbContext> contextFactory = contextFactory;
+    private readonly ILogger<SecuritiesPriceDbInterface> logger = logger;
+
+    public async Task DeleteRecordsForTickersAsync(List<string> tickers)
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            await context.PriceByDate.Where(x => tickers.Contains(x.Ticker))
+                .ExecuteDeleteAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical("Error deleting aged records");
+            logger.LogCritical(ex.Message);
+        }
+    }
+
+    public async Task<bool> DropAgedRecords(List<string> tickers)
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            IEnumerable<string> droppedTickers = await context.PriceByDate.Select(x => x.Ticker)
+                .Distinct()
+                .Except(tickers)
+                .ToListAsync();
+
+            if (droppedTickers.Any())
+            {
+                await context.PriceByDate.Where(x => droppedTickers.Contains(x.Ticker))
+                    .ExecuteDeleteAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Exception occurred deleting records that are not in index");
+            logger.LogError(ex.Message);
+            return false;
+        }
+
+        return true;
+    }
 
     public async Task<List<string>> GetAllTickersAsync()
     {
@@ -33,15 +74,9 @@ internal class SecuritiesPriceDbInterface(ILogger<SecuritiesPriceDbInterface> lo
     public async Task<bool> StorePricingValue(List<PriceByDate> prices)
     {
         var tickersToConsider = prices.Select(x => x.Ticker)
-            .Distinct();
-        foreach (var ticker in tickersToConsider)
-        {
-            if (!string.IsNullOrEmpty(ticker))
-            {
-                logger.LogInformation($"Processing {ticker}");
-                await DeleteRecordsForTickerAsync(ticker);
-            }
-        }
+            .Distinct()
+            .ToList();
+        await DeleteRecordsForTickersAsync(tickersToConsider);
         try
         {
             using var context = await contextFactory.CreateDbContextAsync();
@@ -53,21 +88,6 @@ internal class SecuritiesPriceDbInterface(ILogger<SecuritiesPriceDbInterface> lo
             logger.LogCritical("Unable to add records to Database");
             logger.LogCritical(ex.Message);
             return false;
-        }
-    }
-
-    public async Task DeleteRecordsForTickerAsync(string ticker)
-    {
-        using var context = await contextFactory.CreateDbContextAsync();
-        try
-        {
-            await context.PriceByDate.Where(x => ticker.Equals(x.Ticker))
-                .ExecuteDeleteAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.LogCritical("Error deleting aged records");
-            logger.LogCritical(ex.Message);
         }
     }
 }

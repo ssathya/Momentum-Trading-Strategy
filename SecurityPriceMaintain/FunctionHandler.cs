@@ -30,10 +30,26 @@ internal class FunctionHandler
             return false;
         }
         List<string> tickers = [.. (await dbInterface.GetAllTickersAsync())];
-        return await GetAndStorePricingValues(dbInterface, tickers);
+        bool cleanupResult = await RemoveAgedRecordsAsync(dbInterface, tickers);
+        return await GetAndStorePricingValuesAsync(dbInterface, tickers);
     }
 
-    private async Task<bool> GetAndStorePricingValues(SecuritiesPriceDbInterface dbInterface, List<string> tickers)
+    private static void AppSpecificSettings(IServiceCollection services)
+    {
+        services.AddScoped<SecuritiesPriceDbInterface>();
+    }
+
+    private static async Task<bool> RemoveAgedRecordsAsync(SecuritiesPriceDbInterface dbInterface, List<string> tickers)
+    {
+        var today = DateTime.UtcNow.Date;
+        if (today.DayOfWeek == DayOfWeek.Wednesday) //need to pick some day; Wednesday falls in the middle of the week
+        {
+            return await dbInterface.DropAgedRecords(tickers);
+        }
+        return true;
+    }
+
+    private async Task<bool> GetAndStorePricingValuesAsync(SecuritiesPriceDbInterface dbInterface, List<string> tickers)
     {
         if (dbInterface is null)
         {
@@ -52,7 +68,7 @@ internal class FunctionHandler
             count++;
             IEnumerable<HistoricalData> historicDataList = await yahooClient.GetHistoricalDataAsync(ticker, DataFrequency.Daily, startDate, endDate);
             priceList.AddRange(historicDataList.Select(hist => PriceByDate.GeneratePriceByDate(hist, ticker)));
-            if (count % 5 == 0)
+            if (count % 25 == 0)
             {
                 returnValue = await dbInterface.StorePricingValue(priceList);
                 if (returnValue == false)
@@ -69,10 +85,5 @@ internal class FunctionHandler
             returnValue = await dbInterface.StorePricingValue(priceList);
         }
         return returnValue;
-    }
-
-    private static void AppSpecificSettings(IServiceCollection services)
-    {
-        services.AddScoped<SecuritiesPriceDbInterface>();
     }
 }
