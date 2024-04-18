@@ -1,7 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using SecurityPriceMaintain;
+using ComputeMomentum;
 
-Console.WriteLine("Obtaining historic prices");
+Console.WriteLine("Computing values");
+//create an instance of FunctionHandler and call DoApplicationProcessingAsync
 var fh = new FunctionHandler();
 await fh.DoApplicationProcessingAsync();
 Console.WriteLine("Done");
