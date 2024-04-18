@@ -58,7 +58,7 @@ internal class FunctionHandler
         }
         int count = 0;
         var yahooClient = new YahooClient();
-        var startDate = DateTime.UtcNow.Date.AddYears(-1)
+        var startDate = DateTime.UtcNow.Date.AddYears(-2)
             .AddDays(-4);
         var endDate = DateTime.UtcNow.Date.AddDays(-1);
         List<PriceByDate> priceList = [];
