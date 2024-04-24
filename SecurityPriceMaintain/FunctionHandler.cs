@@ -30,7 +30,7 @@ internal class FunctionHandler
             return false;
         }
         List<string> tickers = [.. (await dbInterface.GetAllTickersAsync())];
-        bool cleanupResult = await RemoveAgedRecordsAsync(dbInterface, tickers);
+        _ = await RemoveAgedRecordsAsync(dbInterface, tickers);
         return await GetAndStorePricingValuesAsync(dbInterface, tickers);
     }
 
@@ -60,7 +60,7 @@ internal class FunctionHandler
         var yahooClient = new YahooClient();
         var startDate = DateTime.UtcNow.Date.AddYears(-2)
             .AddDays(-4);
-        var endDate = DateTime.UtcNow.Date.AddDays(-1);
+        var endDate = DateTime.UtcNow;
         List<PriceByDate> priceList = [];
         bool returnValue = true;
         foreach (var ticker in tickers)
@@ -77,7 +77,7 @@ internal class FunctionHandler
                 }
                 priceList.Clear();
                 logger?.LogInformation($"Processed {count} of {tickers.Count}");
-                Thread.Sleep(1000);
+                Thread.Sleep(10000);
             }
         }
         if (priceList.Count != 0)

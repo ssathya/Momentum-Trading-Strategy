@@ -61,6 +61,7 @@ internal class SecuritiesPriceDbInterface(ILogger<SecuritiesPriceDbInterface> lo
         {
             tickers = (await context.IndexComponents
                .Where(r => r.LastUpdated >= DateTime.UtcNow.Date)
+               .AsNoTracking()
                .Select(x => x.Ticker ?? "").ToListAsync());
         }
         catch (Exception ex)
