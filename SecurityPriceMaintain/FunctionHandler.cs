@@ -5,6 +5,8 @@ using Models;
 using OoplesFinance.YahooFinanceAPI;
 using OoplesFinance.YahooFinanceAPI.Enums;
 using OoplesFinance.YahooFinanceAPI.Models;
+using Polly;
+using Polly.Retry;
 using SecurityPriceMaintain.Services;
 
 namespace SecurityPriceMaintain;
@@ -13,6 +15,7 @@ internal class FunctionHandler
 {
     private const string ApplicationName = "SecurityPriceMaintain";
     private ILogger<FunctionHandler>? logger;
+    private AsyncRetryPolicy? retryPolicy;
 
     internal async Task<bool> DoApplicationProcessingAsync()
     {
@@ -34,11 +37,6 @@ internal class FunctionHandler
         return await GetAndStorePricingValuesAsync(dbInterface, tickers);
     }
 
-    private static void AppSpecificSettings(IServiceCollection services)
-    {
-        services.AddScoped<SecuritiesPriceDbInterface>();
-    }
-
     private static async Task<bool> RemoveAgedRecordsAsync(SecuritiesPriceDbInterface dbInterface, List<string> tickers)
     {
         var today = DateTime.UtcNow.Date;
@@ -47,6 +45,16 @@ internal class FunctionHandler
             return await dbInterface.DropAgedRecords(tickers);
         }
         return true;
+    }
+
+    private void AppSpecificSettings(IServiceCollection services)
+    {
+        services.AddScoped<SecuritiesPriceDbInterface>();
+        retryPolicy = Policy
+            .Handle<HttpRequestException>()
+            .WaitAndRetryAsync(
+            retryCount: 5,
+            sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
     }
 
     private async Task<bool> GetAndStorePricingValuesAsync(SecuritiesPriceDbInterface dbInterface, List<string> tickers)
@@ -66,7 +74,13 @@ internal class FunctionHandler
         foreach (var ticker in tickers)
         {
             count++;
-            IEnumerable<HistoricalData> historicDataList = await yahooClient.GetHistoricalDataAsync(ticker, DataFrequency.Daily, startDate, endDate);
+            IEnumerable<HistoricalData> historicDataList = [];
+            if (retryPolicy is not null)
+            {
+                historicDataList = await retryPolicy.ExecuteAsync
+                    (() => yahooClient.GetHistoricalDataAsync
+                    (ticker, DataFrequency.Daily, startDate, endDate));
+            }
             priceList.AddRange(historicDataList.Select(hist => PriceByDate.GeneratePriceByDate(hist, ticker)));
             if (count % 25 == 0)
             {
@@ -77,7 +91,7 @@ internal class FunctionHandler
                 }
                 priceList.Clear();
                 logger?.LogInformation($"Processed {count} of {tickers.Count}");
-                Thread.Sleep(10000);
+                Thread.Sleep(100);
             }
         }
         if (priceList.Count != 0)
