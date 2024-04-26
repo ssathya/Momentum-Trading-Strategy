@@ -38,14 +38,14 @@ internal class MomentumDbMethods(ILogger<MomentumDbMethods> logger, IDbContextFa
     {
         using var context = await contextFactory.CreateDbContextAsync();
         List<DataFrameSim> results = [];
-        int incrementCount = 30;
+        int incrementCount = 100;
         try
         {
             for (int i = 0; i < tickers.Count; i += incrementCount)
             {
                 var selectedTickers = tickers.Skip(i).Take(incrementCount).ToList();
                 var dbObjects = await context.PriceByDate
-                    .Select(r => new { r.Date, r.Ticker, r.AdjClose })
+                    .Select(r => new { r.Date, r.Ticker, r.Close })
                     .Where(r => selectedTickers.Contains(r.Ticker)).ToListAsync();
                 foreach (var dbObject in dbObjects)
                 {
@@ -58,7 +58,7 @@ internal class MomentumDbMethods(ILogger<MomentumDbMethods> logger, IDbContextFa
                         };
                         results.Add(resultObj);
                     }
-                    resultObj.ValueByDate.Add(DateOnly.FromDateTime(dbObject.Date), (double)dbObject.AdjClose);
+                    resultObj.ValueByDate.Add(DateOnly.FromDateTime(dbObject.Date), (double)dbObject.Close);
                 }
             }
         }

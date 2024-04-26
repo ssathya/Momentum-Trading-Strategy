@@ -1,6 +1,6 @@
 ﻿namespace ComputeMomentum.Internal;
 
-internal class TickerGainByDate
+public class TickerGainByDate
 {
     public DateOnly ReportedDate { get; set; }
     public string Ticker { get; set; } = string.Empty;
