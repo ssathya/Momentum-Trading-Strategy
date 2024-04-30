@@ -16,4 +16,6 @@ public class SelectedTicker
 
     public double Close { get; set; }
     public double AnnualPercentGain { get; set; }
+    public double HalfYearlyPercentGain { get; set; }
+    public double QuarterYearlyPercentGain { get; set; }
 }

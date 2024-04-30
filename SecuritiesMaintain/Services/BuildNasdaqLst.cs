@@ -7,7 +7,9 @@ namespace SecuritiesMaintain.Services;
 
 internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst> logger, HttpClient client) : IBuildNasdaqLst
 {
-    private const string nodeEleToProcess = """//*[@id='constituents']/tbody/tr""";
+    //private const string nodeEleToProcess = """//*[@id='constituents']/tbody/tr""";
+    private const string nodeEleToProcess = """//*/table[5]/tbody/tr""";
+
     private const string tableDataTag = "td";
     private const string tableHeaderTag = "<th>";
     private readonly HttpClient client = client;
@@ -32,9 +34,9 @@ internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst>
         HtmlDocument htmlDocument = new();
         htmlDocument.LoadHtml(pageContent);
         HtmlNodeCollection nodes = htmlDocument.DocumentNode.SelectNodes(nodeEleToProcess);
-        if (nodes.Count == 0)
+        if (nodes == null || nodes.Count == 0)
         {
-            logger.LogWarning($"Parsing error; URL = {url}");
+            logger.LogCritical($"Parsing error; URL = {url}");
             return null;
         }
         foreach (var node in nodes)

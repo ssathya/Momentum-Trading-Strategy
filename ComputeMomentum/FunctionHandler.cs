@@ -97,7 +97,10 @@ internal class FunctionHandler
                     Date = selectedTicker.ReportedDate.ToDateTime(TimeOnly.Parse("04:00 AM")).ToUniversalTime(),
                     Close = results.Find(r => r.Ticker.Equals(selectedTicker.Ticker))?.ValueByDate.Last().Value ?? 0,
                     AnnualPercentGain = yearlyPercentGains
-                    .Find(r => r.Ticker.Equals(selectedTicker.Ticker))?.ChangePercent ?? 0
+                    .Find(r => r.Ticker.Equals(selectedTicker.Ticker))?.ChangePercent ?? 0,
+                    HalfYearlyPercentGain = halfYearPercentGains
+                    .Find(r => r.Ticker.Equals(selectedTicker.Ticker))?.ChangePercent ?? 0,
+                    QuarterYearlyPercentGain = selectedTicker.ChangePercent
                 });
             }
         }
