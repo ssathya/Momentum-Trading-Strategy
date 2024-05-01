@@ -82,7 +82,7 @@ internal class FunctionHandler
                     (ticker, DataFrequency.Daily, startDate, endDate));
             }
             priceList.AddRange(historicDataList.Select(hist => PriceByDate.GeneratePriceByDate(hist, ticker)));
-            if (count % 25 == 0)
+            if (count % 100 == 0)
             {
                 returnValue = await dbInterface.StorePricingValue(priceList);
                 if (returnValue == false)
@@ -97,6 +97,7 @@ internal class FunctionHandler
         if (priceList.Count != 0)
         {
             returnValue = await dbInterface.StorePricingValue(priceList);
+            logger?.LogInformation($"Processed {count} of {tickers.Count}");
         }
         return returnValue;
     }
