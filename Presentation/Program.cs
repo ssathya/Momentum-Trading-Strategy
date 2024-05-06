@@ -1,3 +1,4 @@
+using AppCommon;
 using Azure.Identity;
 using Presentation.Components;
 using Radzen;
@@ -9,6 +10,11 @@ builder.Configuration.AddAzureAppConfiguration(options =>
     options.Connect(new Uri(@"https://momentum-trading.azconfig.io"), credential);
 });
 builder.Services.AddRadzenComponents();
+
+//Database Connection
+ServiceHandler.ConnectToDb(builder.Services);
+
+//Dependency injection
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
