@@ -64,6 +64,9 @@ internal class IndexToDbService(ILogger<IndexToDbService> logger, IDbContextFact
                                                         let existingRecord = icInDb.FirstOrDefault(x => x.Ticker == component.Ticker)
                                                         select (component, existingRecord))
             {
+                Console.WriteLine(component.Ticker);
+                if (component.Ticker.Trim().Equals("VST"))
+                    Console.WriteLine("Here");
                 if (existingRecord == null)
                 {
                     icInDb.Add(component);
@@ -73,8 +76,16 @@ internal class IndexToDbService(ILogger<IndexToDbService> logger, IDbContextFact
                     existingRecord.SetNewValues(component);
                 }
             }
+            BulkConfig bulkConfig = new BulkConfig
+            {
+                SetOutputIdentity = true,
+                PreserveInsertOrder = false,
+                BatchSize = 1000
+            };
 
-            await context.BulkInsertOrUpdateAsync(icInDb);
+            await context.BulkInsertAsync(icInDb.Where(x => x.Id == 0), bulkConfig);
+            await context.BulkUpdateAsync(icInDb.Where(x => x.Id != 0), bulkConfig);
+            await context.SaveChangesAsync();
         }
         catch (Exception ex)
         {
