@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityPriceMaintain", "Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputeMomentum", "ComputeMomentum\ComputeMomentum.csproj", "{3F409B0E-8CA1-4B67-A604-AFBABCA8B13F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation", "Presentation\Presentation.csproj", "{820F56BA-4BDF-4B31-BF87-A46E24CFF058}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Presentation", "Presentation\Presentation.csproj", "{820F56BA-4BDF-4B31-BF87-A46E24CFF058}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
