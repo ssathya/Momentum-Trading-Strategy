@@ -19,4 +19,5 @@ public class SelectedTicker
     public double HalfYearlyPercentGain { get; set; }
     public double QuarterYearlyPercentGain { get; set; }
     public DateTime LastUpdated { get; set; }
+    public string? CompanyName { get; set; }
 }

@@ -1,0 +1,17 @@
+﻿@page "/current"
+@using Models
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<RadzenText TextStyle="TextStyle.H3">Current Selection</RadzenText>
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" TItem="SelectedTicker"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true" 
+                Data="selectedTickers" SelectionMode="DataGridSelectionMode.Single" RowSelect="@TickerSelected">
+    <Columns>
+        <RadzenDataGridColumn Property="Ticker" Filterable="true" Title="Ticker" />
+        <RadzenDataGridColumn Property="CompanyName" Filterable="true" Title="Company Name" />
+        <RadzenDataGridColumn Property="Date" Filterable="false" Title="Reporting Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="Close" Filterable="true" Title="Closing Price" FormatString="${0:#,0.00}" TextAlign="TextAlign.Right"/>
+    </Columns>
+</RadzenDataGrid>
+
+
