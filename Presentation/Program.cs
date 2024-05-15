@@ -1,5 +1,4 @@
 using AppCommon;
-using Azure.Identity;
 using Presentation.Components;
 using Presentation.Services;
 using Radzen;
@@ -7,14 +6,13 @@ using Serilog;
 using System.Text;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-var credential = new DefaultAzureCredential();
-builder.Configuration.AddAzureAppConfiguration(options =>
-{
-    options.Connect(new Uri(@"https://momentum-trading.azconfig.io"), credential);
-});
 builder.Services.AddRadzenComponents();
+
+//Get connection string from AWS System Manager
+builder.Configuration.AddSystemsManager("/Momentum", TimeSpan.FromMinutes(5));
 //Logger
 IConfiguration configuration = builder.Configuration;
+
 StringBuilder filePath = new();
 filePath.Append(Path.GetTempPath() + "/");
 filePath.Append("Presentation-.log");
@@ -28,13 +26,13 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Services.AddLogging(c =>
 {
-    c.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
+    c.SetMinimumLevel(LogLevel.Information);
     c.AddSerilog(Log.Logger);
 });
 Log.Logger.Information("Application Started");
 
 //Database Connection
-ServiceHandler.ConnectToDb(builder.Services);
+ServiceHandler.ConnectToDb(builder.Services, configuration["ConnectionString"] ?? string.Empty);
 
 //Dependency injection
 builder.Services.AddScoped<IGetSelectedTickers, GetSelectedTickers>();

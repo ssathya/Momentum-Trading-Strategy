@@ -79,7 +79,8 @@ public static class ServiceHandler
 
     public static void ConnectToDb(IServiceCollection services)
     {
-        IConfiguration configuration = ServiceHandler.GetConfiguration();
+        IConfiguration configuration = GetConfiguration();
+
         string? connectionStrCombined = configuration["SecuritiesMaintain:ConnectionString"];
         if (string.IsNullOrEmpty(connectionStrCombined))
         {
@@ -87,8 +88,15 @@ public static class ServiceHandler
             return;
         }
         string[] connectionStrs = connectionStrCombined.Split('|');
-        string connectionStr = Environment.MachineName.Contains("-DELL", StringComparison.InvariantCultureIgnoreCase) ? connectionStrs[1] ?? "" : connectionStrs[0] ?? "";
+        string connectionStr = Environment.MachineName
+            .Contains("-DELL", StringComparison.InvariantCultureIgnoreCase) ?
+            connectionStrs[1] ?? "" : connectionStrs[0] ?? "";
 
+        ConnectToDb(services, string.Empty);
+    }
+
+    public static void ConnectToDb(IServiceCollection services, string connectionStr)
+    {
         if (!string.IsNullOrEmpty(connectionStr))
             services.AddDbContextFactory<AppDbContext>(options =>
             {
