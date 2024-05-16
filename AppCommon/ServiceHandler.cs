@@ -92,7 +92,7 @@ public static class ServiceHandler
             .Contains("-DELL", StringComparison.InvariantCultureIgnoreCase) ?
             connectionStrs[1] ?? "" : connectionStrs[0] ?? "";
 
-        ConnectToDb(services, string.Empty);
+        ConnectToDb(services, connectionStr);
     }
 
     public static void ConnectToDb(IServiceCollection services, string connectionStr)
