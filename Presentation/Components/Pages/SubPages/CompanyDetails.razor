@@ -1,0 +1,56 @@
+﻿@using Humanizer
+<h3>CompanyDetails</h3>
+@if (!string.IsNullOrWhiteSpace(Ticker))
+{
+    @* <RadzenText TextStyle="TextStyle.Subtitle1" Text="Ticker is set to " />
+    <br />
+    <RadzenText TextStyle="TextStyle.Body1">@Ticker</RadzenText> *@
+
+    <RadzenRow class="rz-border-info-light">
+        <RadzenColumn>
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <RadzenText TextStyle="TextStyle.H4" Text=@CompanyName />
+                    </div>
+                    <div class="card-body">
+                        <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Justify">@CompanyDescription</RadzenText>
+                    </div>
+                </div>
+            </div>
+            @*             <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
+        <div class="rz-background-color-primary-light rz-shadow-0 rz-border-radius-0 rz-p-8">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+        <RadzenText TextStyle="TextStyle.H4" Text=@CompanyName />
+        </RadzenStack>
+        </div>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+        <RadzenText TextStyle="TextStyle.Body1">@CompanyDescription</RadzenText>
+        </RadzenStack>
+        </RadzenCard> *@
+        </RadzenColumn>
+        <RadzenColumn>
+            <table class="table table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prop in RealTimeQuote.GetType().GetProperties())
+                    {
+
+                        <tr>
+                            <td>@prop.Name.Humanize()</td>
+                            <td>@prop.GetValue(RealTimeQuote, null)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </RadzenColumn>
+    </RadzenRow>
+
+
+
+}

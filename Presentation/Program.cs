@@ -1,4 +1,6 @@
 using AppCommon;
+using NeoSmart.Caching.Sqlite;
+using NeoSmart.Caching.Sqlite.AspNetCore;
 using Presentation.Components;
 using Presentation.Services;
 using Radzen;
@@ -36,7 +38,13 @@ ServiceHandler.ConnectToDb(builder.Services, configuration["ConnectionString"] ?
 
 //Dependency injection
 builder.Services.AddScoped<IGetSelectedTickers, GetSelectedTickers>();
-builder.Services.AddHttpClient();
+builder.Services.AddScoped<ICompanyDetails, CompanyDetails>();
+//builder.Services.AddHttpClient();
+
+builder.Services.AddSqliteCache(options =>
+{
+    options.CachePath = Path.Combine(Path.GetTempPath(), "Momentum-cache.db");
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
