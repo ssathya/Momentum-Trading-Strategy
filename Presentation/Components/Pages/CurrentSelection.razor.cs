@@ -3,7 +3,6 @@ using Models;
 using Models.AppModels;
 using Presentation.Services;
 using Radzen;
-using System;
 
 namespace Presentation.Components.Pages;
 
@@ -13,6 +12,7 @@ public partial class CurrentSelection
     public IGetSelectedTickers? GetSelectedTickers { get; set; }
 
     protected List<SelectedTicker> selectedTickers = [];
+    protected string? selectedTicker = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -36,6 +36,6 @@ public partial class CurrentSelection
 
     private void TickerSelected(SelectedTicker selTicker)
     {
-        Console.WriteLine(selTicker.Ticker);
+        selectedTicker = selTicker.Ticker;
     }
 }
