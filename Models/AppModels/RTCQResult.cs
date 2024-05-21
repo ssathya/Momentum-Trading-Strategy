@@ -10,6 +10,8 @@ public class RTCQResult
     public string QuoteSourceName { get; set; } = string.Empty;
     public double? EpsCurrentYear { get; set; }
     public double? EpsForward { get; set; }
+    public string MarketCap { get; set; } = string.Empty;
+    public string AverageAnalystRating { get; set; } = string.Empty;
     public string FiftyTwoWeekRange { get; set; } = string.Empty;
     public string RegularMarketDayRange { get; set; } = string.Empty;
     public double? ForwardPE { get; set; }
@@ -34,7 +36,9 @@ public class RTCQResult
             TrailingPE = Math.Floor(quoteResult.TrailingPE ?? 0 * 100) / 100,
             ForwardPE = Math.Floor(quoteResult.ForwardPE ?? 0 * 100) / 100,
             EpsCurrentYear = Math.Floor(quoteResult.EpsCurrentYear ?? 0 * 100) / 100,
-            EpsForward = Math.Floor(quoteResult.EpsForward ?? 0 * 100) / 100
+            EpsForward = Math.Floor(quoteResult.EpsForward ?? 0 * 100) / 100,
+            MarketCap = StringHelper.ToKMB((double)(quoteResult.MarketCap ?? 0)),
+            AverageAnalystRating = quoteResult.AverageAnalystRating
         };
     }
 
