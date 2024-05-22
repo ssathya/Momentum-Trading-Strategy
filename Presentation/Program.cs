@@ -5,8 +5,12 @@ using Presentation.Components;
 using Presentation.Services;
 using Radzen;
 using Serilog;
+using System.Globalization;
 using System.Text;
 
+CultureInfo cultureInfo = new("en-US");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRadzenComponents();
 
@@ -51,6 +55,16 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture(cultureInfo),
+    SupportedCultures = new[] {
+        cultureInfo
+    },
+    SupportedUICultures = new[] {
+       cultureInfo
+    }
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
