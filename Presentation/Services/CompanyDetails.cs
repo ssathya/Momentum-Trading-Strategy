@@ -17,64 +17,63 @@ public class CompanyDetails(IDistributedCache cache, ILogger<CompanyDetails> log
     public async Task<AssetProfile> RetrieveCompanyProfile(string symbol)
     {
         string cacheKey = $"{symbol}-profile";
-        AssetProfile profile;
-        try
+        var existingCache = cache.GetString(cacheKey) ?? "";
+
+        AssetProfile profile = new();
+        if (!string.IsNullOrEmpty(existingCache))
         {
             profile = JsonSerializer.Deserialize<AssetProfile>(cache.GetString(cacheKey) ?? "") ?? new AssetProfile();
+            if (!string.IsNullOrEmpty(profile.LongBusinessSummary))
+            {
+                return profile;
+            }
         }
-        catch
-        {
-            profile = new AssetProfile();
-        }
-        if (!string.IsNullOrEmpty(profile.LongBusinessSummary))
-        {
-            return profile;
-        };
         if (yahooClient != null)
         {
             await retryPolicy.ExecuteAsync(async () =>
             {
                 profile = await yahooClient.GetAssetProfileAsync(symbol);
+                string profileSerialized = JsonSerializer.Serialize(profile);
+                cache.SetString(cacheKey, profileSerialized, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(10)
+                });
             });
-            string profileSerialized = JsonSerializer.Serialize(profile);
-            cache.SetString(cacheKey, profileSerialized, new DistributedCacheEntryOptions
+            if (profile.LongBusinessSummary != null)
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(10)
-            });
+                return profile;
+            }
         }
         else
         {
             logger.LogCritical("Application is not configured to use Yahoo Finance API");
         }
-        return profile;
+        return new AssetProfile();
     }
 
     public async Task<RealTimeQuoteResult> RetrieveQuotes(string symbol)
     {
         string cacheKey = $"{symbol}-quotes";
-        RealTimeQuoteResult? quotes;
-        try
+        var existingCache = cache.GetString(cacheKey);
+        RealTimeQuoteResult? quotes = new();
+        if (!string.IsNullOrEmpty(existingCache))
         {
-            quotes = JsonSerializer.Deserialize<RealTimeQuoteResult>(cache.GetString(cacheKey) ?? "");
-        }
-        catch
-        {
-            quotes = null;
-        }
-        if (quotes != null && !string.IsNullOrEmpty(quotes.FiftyTwoWeekRange))
-        {
-            return quotes;
+            quotes = JsonSerializer.Deserialize<RealTimeQuoteResult>(existingCache);
+            if (quotes != null && !string.IsNullOrEmpty(quotes.FiftyTwoWeekRange))
+            {
+                return quotes;
+            }
         }
         if (yahooClient != null)
         {
             await retryPolicy.ExecuteAsync(async () =>
             {
                 quotes = await yahooClient.GetRealTimeQuotesAsync(symbol);
-            });
-            string quotesSerialized = JsonSerializer.Serialize(quotes);
-            cache.SetString(cacheKey, quotesSerialized, new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+                string quotesSerialized = JsonSerializer.Serialize(quotes);
+                cache.SetString(cacheKey, quotesSerialized, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+                });
             });
         }
         else
