@@ -1,0 +1,25 @@
+﻿<br/>
+@if (PriceByDates is not null && PriceByDates.Count > 5)
+{
+    <div class="container-fluid border border-3 border-primary">
+        <RadzenText TextStyle="TextStyle.H3" TextAlign="TextAlign.Center">@TickerName?.CompanyName</RadzenText>
+        <RadzenRadioButtonList @bind-Value=@currentSelect TValue="int" class="mb-5" Change="@PeriodChange">
+            <Items>
+                <RadzenRadioButtonListItem Text="2 Years" Value="0"/>
+                <RadzenRadioButtonListItem Text="1 Year" Value="1" />
+                <RadzenRadioButtonListItem Text="6 Months" Value="2" />
+                <RadzenRadioButtonListItem Text="3 Months" Value="3" />
+            </Items>
+        </RadzenRadioButtonList>
+        <RadzenChart>
+                <RadzenLineSeries Smooth="true" Data="@PriceByDates"  Title="@TickerName?.CompanyName" CategoryProperty="Date" ValueProperty="AdjClose">
+                    <RadzenMarkers Visible="true" MarkerType="MarkerType.Circle" />
+                </RadzenLineSeries>
+                <RadzenValueAxis Formatter="@FormatAsUSD">
+                    <RadzenGridLines Visible="true"/>
+                    <RadzenAxisTitle Text="Closing Price" />
+                </RadzenValueAxis>
+            </RadzenChart>        
+    </div>
+
+}
