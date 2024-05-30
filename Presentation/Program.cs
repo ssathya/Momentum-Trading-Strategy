@@ -43,6 +43,7 @@ ServiceHandler.ConnectToDb(builder.Services, configuration["ConnectionString"] ?
 //Dependency injection
 builder.Services.AddScoped<IGetSelectedTickers, GetSelectedTickers>();
 builder.Services.AddScoped<ICompanyDetails, CompanyDetails>();
+builder.Services.AddScoped<IMonthlyReturnsServices, MonthlyReturnsServices>();
 //builder.Services.AddHttpClient();
 
 builder.Services.AddSqliteCache(options =>

@@ -4,6 +4,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <RadzenText TextStyle="TextStyle.H3">Current Selection</RadzenText>
+
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" TItem="SelectedTicker"
                 FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true"
                 Data="selectedTickers" SelectionMode="DataGridSelectionMode.Single" RowSelect="@TickerSelected">
