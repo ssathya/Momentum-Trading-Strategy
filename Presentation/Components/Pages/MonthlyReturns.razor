@@ -1,0 +1,36 @@
+﻿@page "/monthlyReturns"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using Models.AppModels
+
+<RadzenText TextStyle="TextStyle.H3">Monthly Selection/Returns</RadzenText>
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Assumptions" Click=@ShowNotificationWithCustomContent />
+</div>
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" TItem="TickersForDate"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true"
+                Data="tickersForDates" SelectionMode="DataGridSelectionMode.Single" RowSelect="@DateSelected">
+    <Columns>
+        <RadzenDataGridColumn Property="Date" Filterable="false" Title="Reporting Date">
+            <Template Context="selCol">
+                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:d}", selCol.Date)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Tickers" Filterable="false" Title="Tickers" Sortable="false" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    protected void ShowNotificationWithCustomContent()
+    {
+        if (NotificationService is not null)
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Info,
+                    Duration = 40000,
+                    SummaryContent = ns =>@<RadzenText TextStyle="TextStyle.H6">Assumptions</RadzenText>,
+                    DetailContent = ns => @<RadzenText Text=@assumptionMessage  TextStyle="TextStyle.Body2" TextAlign="TextAlign.JustifyAll"/>
+            });
+        }
+    }
+}
