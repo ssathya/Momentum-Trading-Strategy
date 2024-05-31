@@ -31,6 +31,7 @@ public class GetSelectedTickers(ILogger<GetSelectedTickers> logger, IDbContextFa
             var selectedTickers = await (from st in context.SelectedTickers
                                          where st.Date == selectedDate
                                          select st)
+                        .Take(10)
                         .ToListAsync();
 
             return selectedTickers;

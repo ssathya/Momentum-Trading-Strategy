@@ -14,7 +14,8 @@ public partial class MonthlyReturns
     public NotificationService? NotificationService { get; set; }
 
     protected List<TickersForDate> tickersForDates = [];
-    protected string? selectedTickers = string.Empty;
+    protected TickersForDate selectedTickersForDate = new();
+    protected bool hasUserSelected = false;
 
     protected string assumptionMessage = "The list below does not consider security survivorship. For instance," +
         " GE Vernova (ticker GEV) was added to the S&P on April 2nd, 2024. If GEV had been in the list of " +
@@ -30,9 +31,13 @@ public partial class MonthlyReturns
         }
     }
 
-    private void DateSelected(TickersForDate tickers)
+    private void DateSelected(TickersForDate tickersForDate)
     {
-        selectedTickers = tickers.Tickers;
+        selectedTickersForDate = tickersForDate;
+        hasUserSelected = true;
         StateHasChanged();
+        if (MonthlyReturnsServices == null) return;
+
+        Task<List<VirtualReturns>> virtualReturns = MonthlyReturnsServices.GetPricesForGivenMonthAsync(selectedTickersForDate, 100000.0);
     }
 }
