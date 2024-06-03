@@ -1,5 +1,4 @@
-﻿using Models;
-using Models.AppModels;
+﻿using Models.AppModels;
 
 namespace Presentation.Services;
 

@@ -22,7 +22,11 @@ public class MonthlyReturnsServices(
                 .Distinct()
                 .OrderBy(t => t.Date)
                 .ToListAsync();
-            return distinctDates;
+            List<DateTime> monthBeginnings = [];
+            monthBeginnings.AddRange(from dateToInspect in distinctDates
+                                     where dateToInspect.Date == TradingCalendar.FirstTradingDayOfMonth(dateToInspect.Month, dateToInspect.Year).Date
+                                     select dateToInspect);
+            return monthBeginnings;
         }
         catch (Exception ex)
         {
@@ -81,6 +85,7 @@ public class MonthlyReturnsServices(
             if (requiredRecordsForTicker.Count == 2)
             {
                 double quantity = fundsAllocatedPerTicker / requiredRecordsForTicker[0].Close;
+                quantity = Math.Round(quantity, 1);
                 VirtualReturns virtualReturn = new();
                 virtualReturn.SetValues(requiredRecordsForTicker[0], requiredRecordsForTicker[1], quantity);
                 virtualReturns.Add(virtualReturn);

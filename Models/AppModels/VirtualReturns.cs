@@ -8,6 +8,7 @@ public class VirtualReturns
     public DateTime PeriodEnd { get; set; }
     public double EndPrice { get; set; }
     public double Quantity { get; set; }
+    public double GainLoss { get; set; }
 
     public void SetValues(PriceByDate startPriceByDate, PriceByDate endPriceByDate, double quantity)
     {
@@ -17,5 +18,6 @@ public class VirtualReturns
         PeriodEnd = endPriceByDate.Date;
         EndPrice = endPriceByDate.Close;
         Quantity = quantity;
+        GainLoss = Math.Round(Quantity * (EndPrice - StartPrice), 2);
     }
 }
