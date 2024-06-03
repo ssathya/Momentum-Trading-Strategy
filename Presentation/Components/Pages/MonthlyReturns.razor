@@ -8,7 +8,7 @@
 </div>
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" TItem="TickersForDate"
                 FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true"
-                Data="tickersForDates" SelectionMode="DataGridSelectionMode.Single" RowSelect="@DateSelected">
+                Data="tickersForDates" SelectionMode="DataGridSelectionMode.Single" RowSelect="@DateSelectedAsync">
     <Columns>
         <RadzenDataGridColumn Property="Date" Filterable="false" Title="Reporting Date">
             <Template Context="selCol">
@@ -18,6 +18,11 @@
         <RadzenDataGridColumn Property="Tickers" Filterable="false" Title="Tickers" Sortable="false" />
     </Columns>
 </RadzenDataGrid>
+<br />
+@if (!string.IsNullOrEmpty(messageToDisplay))
+{
+    <RadzenText TextStyle="TextStyle.Body1">@messageToDisplay</RadzenText>
+}
 
 @code {
     protected void ShowNotificationWithCustomContent()
