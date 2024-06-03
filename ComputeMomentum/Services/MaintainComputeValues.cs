@@ -41,12 +41,28 @@ internal class MaintainComputeValues(ILogger<MaintainComputeValues> logger, IDbC
         }
     }
 
+    private async Task<List<IndexComponent>> GetAllIndexComponentsAsync()
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            List<IndexComponent> indexComponents = await context.IndexComponents.ToListAsync();
+            return indexComponents;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while reading Index Components");
+            return [];
+        }
+    }
+
     public async Task<bool> UpdateSelectedPositions(List<SelectedTicker>? selectedPositions)
     {
         if (selectedPositions == null || selectedPositions.Count == 0)
         {
             return false;
         }
+        List<IndexComponent> indexComponents = await GetAllIndexComponentsAsync();
         using var context = await contextFactory.CreateDbContextAsync();
         try
         {
@@ -57,6 +73,11 @@ internal class MaintainComputeValues(ILogger<MaintainComputeValues> logger, IDbC
                 .ToListAsync();
             foreach (var selectedTicker in selectedPositions)
             {
+                var indexComponent = indexComponents.FirstOrDefault(r => r.Ticker == selectedTicker.Ticker);
+                if (indexComponent != null)
+                {
+                    selectedTicker.CompanyName = indexComponent.CompanyName;
+                }
                 SelectedTicker? existingRecord = spInDb.FirstOrDefault(r => r.Ticker == selectedTicker.Ticker
                 && r.Date == selectedTicker.Date);
                 if (existingRecord == null)
@@ -71,6 +92,7 @@ internal class MaintainComputeValues(ILogger<MaintainComputeValues> logger, IDbC
                     existingRecord.HalfYearlyPercentGain = selectedTicker.HalfYearlyPercentGain;
                     existingRecord.QuarterYearlyPercentGain = selectedTicker.QuarterYearlyPercentGain;
                     existingRecord.LastUpdated = selectedTicker.LastUpdated;
+                    existingRecord.CompanyName = selectedTicker.CompanyName;
                 }
             }
             List<SelectedTicker> spInDb1 = spInDb.Where(r => r.Id != 0)
