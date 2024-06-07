@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputeMomentum", "ComputeM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Presentation", "Presentation\Presentation.csproj", "{820F56BA-4BDF-4B31-BF87-A46E24CFF058}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification", "Notification\Notification.csproj", "{25AB72DF-2F28-4D21-BAD2-F3810EED0AE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{820F56BA-4BDF-4B31-BF87-A46E24CFF058}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{820F56BA-4BDF-4B31-BF87-A46E24CFF058}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{820F56BA-4BDF-4B31-BF87-A46E24CFF058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25AB72DF-2F28-4D21-BAD2-F3810EED0AE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25AB72DF-2F28-4D21-BAD2-F3810EED0AE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25AB72DF-2F28-4D21-BAD2-F3810EED0AE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25AB72DF-2F28-4D21-BAD2-F3810EED0AE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
