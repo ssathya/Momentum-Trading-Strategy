@@ -18,6 +18,19 @@ builder.Services.AddRadzenComponents();
 builder.Configuration.AddSystemsManager("/Momentum", TimeSpan.FromMinutes(5));
 //Logger
 IConfiguration configuration = builder.Configuration;
+//output caching
+builder.Services.AddOutputCache(cfg =>
+{
+    cfg.AddBasePolicy(bldr =>
+    {
+        bldr.With(r => r.HttpContext.Request.Path.StartsWithSegments("/"));
+        bldr.Expire(TimeSpan.FromHours(2));
+    });
+    cfg.AddPolicy("ShortCache", bldr =>
+    {
+        bldr.Expire(TimeSpan.FromSeconds(5));
+    });
+});
 
 StringBuilder filePath = new();
 filePath.Append(Path.GetTempPath() + "/");
@@ -59,12 +72,12 @@ var app = builder.Build();
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture(cultureInfo),
-    SupportedCultures = new[] {
+    SupportedCultures = [
         cultureInfo
-    },
-    SupportedUICultures = new[] {
+    ],
+    SupportedUICultures = [
        cultureInfo
-    }
+    ]
 });
 
 // Configure the HTTP request pipeline.
@@ -76,6 +89,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseOutputCache();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
