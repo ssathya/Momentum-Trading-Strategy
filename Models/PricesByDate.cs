@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NodaTime;
 using OoplesFinance.YahooFinanceAPI.Models;
 using System.ComponentModel.DataAnnotations;
+using YahooQuotesApi;
 
 namespace Models;
 
@@ -33,6 +35,21 @@ public class PriceByDate
             Close = historicalData.Close,
             AdjClose = historicalData.AdjClose,
             Volume = historicalData.Volume
+        };
+    }
+
+    public static PriceByDate GeneratePriceByDate(PriceTick priceTick, string ticker)
+    {
+        return new PriceByDate
+        {
+            Ticker = ticker,
+            Date = priceTick.Date.ToDateTimeUnspecified().ToUniversalTime(),
+            Open = priceTick.Open,
+            High = priceTick.High,
+            Low = priceTick.Low,
+            Close = priceTick.Close,
+            AdjClose = priceTick.AdjustedClose,
+            Volume = priceTick.Volume
         };
     }
 }
