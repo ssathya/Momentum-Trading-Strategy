@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Models.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240430192032_AddedSelectedTicker")]
-    partial class AddedSelectedTicker
+    [Migration("20240719173153_Fixed-TickerSlope-2")]
+    partial class FixedTickerSlope2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,6 +129,9 @@ namespace Models.Migrations
                     b.Property<double>("Close")
                         .HasColumnType("double precision");
 
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
@@ -151,6 +154,68 @@ namespace Models.Migrations
                     b.HasIndex("Ticker");
 
                     b.ToTable("SelectedTickers");
+                });
+
+            modelBuilder.Entity("Models.TickerSlope", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Period")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Ticker" }, "Ticker_IX");
+
+                    b.ToTable("TickerSlopes");
+                });
+
+            modelBuilder.Entity("Models.TickerSlope", b =>
+                {
+                    b.OwnsMany("Models.ComputedSlope", "SlopeResults", b1 =>
+                        {
+                            b1.Property<Guid>("TickerSlopeId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<DateTime>("Date")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<double?>("Intercept")
+                                .HasColumnType("double precision");
+
+                            b1.Property<decimal?>("Line")
+                                .HasColumnType("numeric");
+
+                            b1.Property<double?>("RSquared")
+                                .HasColumnType("double precision");
+
+                            b1.Property<double?>("Slope")
+                                .HasColumnType("double precision");
+
+                            b1.Property<double?>("StdDev")
+                                .HasColumnType("double precision");
+
+                            b1.HasKey("TickerSlopeId", "Id");
+
+                            b1.ToTable("TickerSlopes");
+
+                            b1.ToJson("SlopeResults");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TickerSlopeId");
+                        });
+
+                    b.Navigation("SlopeResults");
                 });
 #pragma warning restore 612, 618
         }
