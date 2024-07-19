@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Models.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240508182131_UpdatedSelectedTicker")]
-    partial class UpdatedSelectedTicker
+    [Migration("20240719155545_ResetDatabase")]
+    partial class ResetDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,40 @@ namespace Models.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Models.ComputedSlope", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("Intercept")
+                        .HasColumnType("double precision");
+
+                    b.Property<decimal?>("Line")
+                        .HasColumnType("numeric");
+
+                    b.Property<double?>("RSquared")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Slope")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("StdDev")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("TickerSlopeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TickerSlopeId");
+
+                    b.ToTable("ComputedSlope");
+                });
 
             modelBuilder.Entity("Models.IndexComponent", b =>
                 {
@@ -154,6 +188,38 @@ namespace Models.Migrations
                     b.HasIndex("Ticker");
 
                     b.ToTable("SelectedTickers");
+                });
+
+            modelBuilder.Entity("Models.TickerSlope", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Period")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TickerSlopes");
+                });
+
+            modelBuilder.Entity("Models.ComputedSlope", b =>
+                {
+                    b.HasOne("Models.TickerSlope", null)
+                        .WithMany("SlopeResults")
+                        .HasForeignKey("TickerSlopeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Models.TickerSlope", b =>
+                {
+                    b.Navigation("SlopeResults");
                 });
 #pragma warning restore 612, 618
         }

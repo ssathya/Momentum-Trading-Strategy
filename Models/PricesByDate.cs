@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NodaTime;
 using OoplesFinance.YahooFinanceAPI.Models;
+using Skender.Stock.Indicators;
 using System.ComponentModel.DataAnnotations;
 using YahooQuotesApi;
 
@@ -50,6 +50,19 @@ public class PriceByDate
             Close = priceTick.Close,
             AdjClose = priceTick.AdjustedClose,
             Volume = priceTick.Volume
+        };
+    }
+
+    public static implicit operator Quote(PriceByDate priceByDate)
+    {
+        return new Quote
+        {
+            Date = priceByDate.Date,
+            Open = (decimal)priceByDate.Open,
+            High = (decimal)priceByDate.High,
+            Low = (decimal)priceByDate.Low,
+            Close = (decimal)priceByDate.Close,
+            Volume = (long)priceByDate.Volume
         };
     }
 }

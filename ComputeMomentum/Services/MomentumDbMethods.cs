@@ -1,4 +1,5 @@
 ﻿using ComputeMomentum.Internal;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Models;
@@ -9,6 +10,7 @@ internal class MomentumDbMethods(ILogger<MomentumDbMethods> logger, IDbContextFa
 {
     private readonly ILogger<MomentumDbMethods> logger = logger;
     private readonly IDbContextFactory<AppDbContext> contextFactory = contextFactory;
+    private const int batchSize = 100;
 
     public async Task<List<string>> GetAllTickersAsync(IndexNames indexNames = IndexNames.None)
     {
@@ -68,5 +70,51 @@ internal class MomentumDbMethods(ILogger<MomentumDbMethods> logger, IDbContextFa
             logger.LogError(ex.Message);
         }
         return results;
+    }
+
+    public async Task<List<PriceByDate>> GetOHLCVForAllTickersAsync(List<string> tickers)
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+        var results = new List<PriceByDate>();
+        try
+        {
+            await context.BulkReadAsync(results);
+            results = await context.PriceByDate.Where(r => tickers.Contains(r.Ticker)).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Error occurred while trying to extract prices from database");
+            logger.LogError(ex.Message);
+        }
+        return results;
+    }
+
+    public async Task<bool> StoreSlopes(List<TickerSlope> tickerSlopes, bool truncateTable = false)
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+        try
+        {
+            if (truncateTable)
+            {
+                using var trans = context.Database.BeginTransaction();
+                await context.TruncateAsync<TickerSlope>();
+                await context.BulkSaveChangesAsync();
+                trans.Commit();
+            }
+            using var transaction = context.Database.BeginTransaction();
+            for (int i = 0; i < tickerSlopes.Count; i += batchSize)
+            {
+                await context.TickerSlopes.AddRangeAsync(tickerSlopes.Skip(i).Take(batchSize));
+                await context.SaveChangesAsync();
+            }
+            transaction.Commit();
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical("Error occurred while trying to update Ticker Slopes");
+            logger.LogCritical(ex.Message);
+            return false;
+        }
+        return true;
     }
 }
