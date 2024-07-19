@@ -37,6 +37,7 @@ internal class FunctionHandler
         List<SelectedTicker> selectedTickers = [];
         computation.ComputeSelectedTickersForPeriod(results, selectedTickers);
         ComputeForPreviousMonths(computation, results, selectedTickers);
+        await ComputeSlopeForAllSecurities(computation, results.Select(r => r.Ticker));
         DateTime currentDate = DateTime.UtcNow.Date;
         foreach (var selectedTicker in selectedTickers)
         {
@@ -93,5 +94,19 @@ internal class FunctionHandler
         services.AddScoped<MomentumDbMethods>();
         services.AddScoped<MaintainComputeValues>();
         services.AddScoped<Computation>();
+    }
+
+    private async Task ComputeSlopeForAllSecurities(Computation computation, IEnumerable<string> tickers)
+    {
+        foreach (Period period in Enum.GetValues(typeof(Period)))
+        {
+            List<TickerSlope> slopes = await computation.ComputeSlopesForAllTickersAsync(tickers, period);
+            if (await computation.StoreSlopeValues(slopes, period == Period.Yearly) == false)
+            {
+                logger?.LogError("Error saving slope values");
+                return;
+            }
+            slopes.Clear();
+        }
     }
 }

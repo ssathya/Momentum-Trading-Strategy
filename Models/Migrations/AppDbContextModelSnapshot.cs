@@ -152,6 +152,68 @@ namespace Models.Migrations
 
                     b.ToTable("SelectedTickers");
                 });
+
+            modelBuilder.Entity("Models.TickerSlope", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Period")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Ticker" }, "Ticker_IX");
+
+                    b.ToTable("TickerSlopes");
+                });
+
+            modelBuilder.Entity("Models.TickerSlope", b =>
+                {
+                    b.OwnsMany("Models.ComputedSlope", "SlopeResults", b1 =>
+                        {
+                            b1.Property<Guid>("TickerSlopeId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<DateTime>("Date")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<double?>("Intercept")
+                                .HasColumnType("double precision");
+
+                            b1.Property<decimal?>("Line")
+                                .HasColumnType("numeric");
+
+                            b1.Property<double?>("RSquared")
+                                .HasColumnType("double precision");
+
+                            b1.Property<double?>("Slope")
+                                .HasColumnType("double precision");
+
+                            b1.Property<double?>("StdDev")
+                                .HasColumnType("double precision");
+
+                            b1.HasKey("TickerSlopeId", "Id");
+
+                            b1.ToTable("TickerSlopes");
+
+                            b1.ToJson("SlopeResults");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TickerSlopeId");
+                        });
+
+                    b.Navigation("SlopeResults");
+                });
 #pragma warning restore 612, 618
         }
     }

@@ -5,24 +5,23 @@
 namespace Models.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdatedSelectedTicker : Migration
+    public partial class FixedTickerSlope2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "CompanyName",
-                table: "SelectedTickers",
-                type: "text",
-                nullable: true);
+            migrationBuilder.CreateIndex(
+                name: "Ticker_IX",
+                table: "TickerSlopes",
+                column: "Ticker");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "CompanyName",
-                table: "SelectedTickers");
+            migrationBuilder.DropIndex(
+                name: "Ticker_IX",
+                table: "TickerSlopes");
         }
     }
 }
