@@ -43,14 +43,15 @@ public static class ServiceHandler
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json"
                 , optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
-            .AddAzureAppConfiguration(options =>
-            {
-                //options.Connect(configProvider);
-                options.Connect(new Uri(@"https://momentum-trading.azconfig.io"), credential);
-                // Wrong code. look into http://tinyurl.com/AzureAppConfig for more details.
-                //options.ConfigureRefresh(refresh =>
-                //{                                                                                                                                       //    refresh.Register(configProvider)                                                                                                    //       .SetCacheExpiration(TimeSpan.FromSeconds(10));                                                                                   //});                                                                                                                                 });                                                                                                                                   Configuration = builder.Build();                                                                                                          return Configuration;                                                                                                                 }
-            });
+            .AddSystemsManager("/Momentum", TimeSpan.FromMinutes(5));
+        //.AddAzureAppConfiguration(options =>
+        //{
+        //    //options.Connect(configProvider);
+        //    options.Connect(new Uri(@"https://momentum-trading.azconfig.io"), credential);
+        //    // Wrong code. look into http://tinyurl.com/AzureAppConfig for more details.
+        //    //options.ConfigureRefresh(refresh =>
+        //    //{                                                                                                                                       //    refresh.Register(configProvider)                                                                                                    //       .SetCacheExpiration(TimeSpan.FromSeconds(10));                                                                                   //});                                                                                                                                 });                                                                                                                                   Configuration = builder.Build();                                                                                                          return Configuration;                                                                                                                 }
+        //});
         Configuration = builder.Build();
 
         return Configuration;
@@ -81,17 +82,12 @@ public static class ServiceHandler
     {
         IConfiguration configuration = GetConfiguration();
 
-        string? connectionStrCombined = configuration["SecuritiesMaintain:ConnectionString"];
-        if (string.IsNullOrEmpty(connectionStrCombined))
+        string? connectionStr = configuration["ConnectionString"];
+        if (string.IsNullOrEmpty(connectionStr))
         {
             Console.WriteLine("Unable to get connection strings");
             return;
         }
-        string[] connectionStrs = connectionStrCombined.Split('|');
-        string connectionStr = Environment.MachineName
-            .Contains("-DELL", StringComparison.InvariantCultureIgnoreCase) ?
-            connectionStrs[1] ?? "" : connectionStrs[0] ?? "";
-
         ConnectToDb(services, connectionStr);
     }
 

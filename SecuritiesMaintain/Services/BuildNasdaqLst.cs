@@ -19,7 +19,7 @@ internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst>
     public async Task<List<IndexComponent>?> GetListAsync()
     {
         List<IndexComponent>? extractedValues = [];
-        string? url = configuration.GetValue<string>("SecuritiesMaintain:Nasdaq100URL");
+        string? url = configuration.GetValue<string>("Nasdaq100URL");
         if (url is null)
         {
             logger.LogError("Could not get NASDAQ100 URL from configuration");
