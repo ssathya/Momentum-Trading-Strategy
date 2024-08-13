@@ -17,7 +17,7 @@ internal class BuildSnPLst(IConfiguration configuration, ILogger<BuildSnPLst> lo
     public async Task<List<IndexComponent>?> GetListAsync()
     {
         List<IndexComponent> extractedValues = [];
-        string? url = configuration.GetValue<string>("SecuritiesMaintain:SNP500URL");
+        string? url = configuration.GetValue<string>("SNP500URL");
         if (url is null)
         {
             logger.LogError("Could not get S&P-500 URL for processing");

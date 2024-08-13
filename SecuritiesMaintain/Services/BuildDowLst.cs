@@ -20,10 +20,10 @@ internal class BuildDowLst(IConfiguration configuration, ILogger<BuildDowLst> lo
     public async Task<List<IndexComponent>?> GetListAsync()
     {
         List<IndexComponent>? extractedValues = [];
-        string? url = configuration.GetValue<string>("SecuritiesMaintain:Dow30URL");
+        string? url = configuration.GetValue<string>("Dow30URL");
         if (url is null)
         {
-            logger.LogError("Could not get NASDAQ100 URL from configuration");
+            logger.LogError("Could not get DOW30URL URL from configuration");
             return null;
         }
         var pageContent = await client.GetStringAsync(url);

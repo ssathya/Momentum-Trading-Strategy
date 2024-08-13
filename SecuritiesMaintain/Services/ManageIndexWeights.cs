@@ -24,9 +24,9 @@ internal class ManageIndexWeights(IConfiguration configuration, ILogger<ManageIn
         {
             return false;
         }
-        string? snpWeightUrl = configuration.GetValue<string>("SecuritiesMaintain:SNPWeight");
-        string? nasdaqWeightUrl = configuration.GetValue<string>("SecuritiesMaintain:NasdaqWeight");
-        string? dow30WeightUrl = configuration.GetValue<string>("SecuritiesMaintain:DowWeight");
+        string? snpWeightUrl = configuration.GetValue<string>("SNPWeight");
+        string? nasdaqWeightUrl = configuration.GetValue<string>("NasdaqWeight");
+        string? dow30WeightUrl = configuration.GetValue<string>("DowWeight");
 
         if (string.IsNullOrEmpty(snpWeightUrl))
         {
