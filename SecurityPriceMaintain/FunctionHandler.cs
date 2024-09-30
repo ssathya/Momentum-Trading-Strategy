@@ -147,9 +147,9 @@ internal class FunctionHandler
         foreach (var ticker in tickers)
         {
             try
-            {
+            {                
                 count++;
-                IEnumerable<HistoricalData> historicDataList = [];
+                IEnumerable<HistoricalChartInfo> historicDataList = [];
                 if (retryPolicy is not null)
                 {
                     historicDataList = await retryPolicy.ExecuteAsync
