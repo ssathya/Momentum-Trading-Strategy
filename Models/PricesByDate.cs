@@ -23,7 +23,7 @@ public class PriceByDate
     public double AdjClose { get; set; }
     public double Volume { get; set; }
 
-    public static PriceByDate GeneratePriceByDate(HistoricalData historicalData, string ticker)
+    public static PriceByDate GeneratePriceByDate(HistoricalChartInfo historicalData, string ticker)
     {
         return new PriceByDate
         {
@@ -33,7 +33,7 @@ public class PriceByDate
             High = historicalData.High,
             Low = historicalData.Low,
             Close = historicalData.Close,
-            AdjClose = historicalData.AdjClose,
+            AdjClose = historicalData.AdjustedClose,
             Volume = historicalData.Volume
         };
     }
@@ -53,9 +53,9 @@ public class PriceByDate
         };
     }
 
-    public static implicit operator Quote(PriceByDate priceByDate)
+    public static implicit operator Skender.Stock.Indicators.Quote(PriceByDate priceByDate)
     {
-        return new Quote
+        return new Skender.Stock.Indicators.Quote
         {
             Date = priceByDate.Date,
             Open = (decimal)priceByDate.Open,
