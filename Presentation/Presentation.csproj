@@ -7,18 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Amazon.Extensions.Configuration.SystemsManager" Version="6.2.1" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.400.4" />
+    <PackageReference Include="Amazon.Extensions.Configuration.SystemsManager" Version="6.2.2" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.405" />
     <PackageReference Include="FluentDateTime" Version="3.0.0" />
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
     <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="8.0.0" />
-    <PackageReference Include="OoplesFinance.YahooFinanceAPI" Version="1.6.8" />
-    <PackageReference Include="Polly" Version="8.4.1" />
-    <PackageReference Include="Radzen.Blazor" Version="4.33.3" />
+    <PackageReference Include="OoplesFinance.YahooFinanceAPI" Version="1.6.10" />
+    <PackageReference Include="Polly" Version="8.4.2" />
+    <PackageReference Include="Radzen.Blazor" Version="5.3.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
