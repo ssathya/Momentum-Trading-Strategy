@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCore.BulkExtensions.PostgreSql" Version="8.0.4" />
+    <PackageReference Include="EFCore.BulkExtensions.PostgreSql" Version="8.1.1" />
     <PackageReference Include="Skender.Stock.Indicators" Version="2.5.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.4" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>
