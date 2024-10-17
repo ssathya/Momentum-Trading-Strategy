@@ -26,7 +26,18 @@ internal class FunctionHandler
             if (!wasSuccessful)
             {
                 logger.LogError("Failed to generate summaries");
+                return;
             }
+        }
+        GenerateExcel? generateExcel = provider.GetRequiredService<GenerateExcel>();
+        if (generateExcel != null)
+        {
+            bool wasSuccessful = await generateExcel.GenerateExcelAsync();
+            if (!wasSuccessful)
+            {
+                logger.LogError("Failed to generate excel s/s");
+            }
+            await generateExcel.RecrusiveSelection();
         }
     }
 
@@ -34,5 +45,6 @@ internal class FunctionHandler
     {
         services.AddScoped<ComputeSummaries>();
         services.AddScoped<SummaryDbMethods>();
+        services.AddScoped<GenerateExcel>();
     }
 }

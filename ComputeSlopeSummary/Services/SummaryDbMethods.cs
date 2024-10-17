@@ -18,6 +18,24 @@ internal class SummaryDbMethods(ILogger<SummaryDbMethods> logger, IDbContextFact
         return tickerSlopes;
     }
 
+    public async Task<List<SlopeSummary>> GetSlopeSummaryAsync(Period period)
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+        List<SlopeSummary> slopeSummaries = await context.SlopeSummaries.Where(p => p.Period == period).ToListAsync();
+        return slopeSummaries;
+    }
+
+    public async Task<Dictionary<string, string>> GetCompanyNamesAsync()
+    {
+        using var context = await contextFactory.CreateDbContextAsync();
+        Dictionary<string, string> companyNames = [];
+        foreach (var item in await context.IndexComponents.Select(x => new { x.Ticker, x.CompanyName }).ToListAsync())
+        {
+            companyNames[item.Ticker] = item.CompanyName ?? "";
+        }
+        return companyNames;
+    }
+
     public async Task<bool> StoreSlopeSummary(List<SlopeSummary> slopeSummaries)
     {
         using var context = await contextFactory.CreateDbContextAsync();
