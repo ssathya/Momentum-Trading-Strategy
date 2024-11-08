@@ -37,7 +37,7 @@ internal class FunctionHandler
             {
                 logger.LogError("Failed to generate excel s/s");
             }
-            await generateExcel.RecrusiveSelection();
+            await generateExcel.RecursiveSelection();
         }
     }
 
