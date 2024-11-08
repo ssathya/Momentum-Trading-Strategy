@@ -51,17 +51,17 @@ internal class GenerateExcel(ILogger<GenerateExcel> logger, SummaryDbMethods dbM
         catch (Exception ex)
         {
             logger.LogError("Error creating excel file");
-            logger.LogError(ex.ToString());
+            logger.LogError(message: ex.ToString());
         }
         return false;
     }
 
-    public async Task RecrusiveSelection()
+    public async Task RecursiveSelection()
     {
         string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         string excelDirectory = Path.Combine(homeFolder, "excelDirectory");
         Directory.CreateDirectory(excelDirectory);
-        string stringFileName = "RecrusiveSelction.xlsx";
+        string stringFileName = "RecursiveSelection.xlsx";
         string excelFilePath = Path.Combine(excelDirectory, stringFileName);
         if (File.Exists(excelFilePath))
         {
@@ -97,7 +97,7 @@ internal class GenerateExcel(ILogger<GenerateExcel> logger, SummaryDbMethods dbM
             sheetData.Last().CompanyName = tickerCompanyName[slopeSummary.Ticker] ?? "";
         }
         var excelWorkBook = new XLWorkbook();
-        string sheetName = "RecrusiveSelction";
+        string sheetName = "RecursiveSelection";
         var worksheet = excelWorkBook.Worksheets.Add(sheetName);
         worksheet.ColumnWidth = 25;
         IXLTable table = worksheet.FirstCell().InsertTable(sheetData);
