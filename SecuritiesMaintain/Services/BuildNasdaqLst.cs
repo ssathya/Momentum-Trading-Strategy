@@ -60,11 +60,11 @@ internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst>
         {
             switch (index)
             {
-                case 0:
+                case 1:
                     component.CompanyName = col.InnerText;
                     break;
 
-                case 1:
+                case 0:
                     component.Ticker = col.InnerText;
                     break;
 
