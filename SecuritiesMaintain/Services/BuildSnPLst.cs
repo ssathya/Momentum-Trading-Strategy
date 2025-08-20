@@ -23,6 +23,7 @@ internal class BuildSnPLst(IConfiguration configuration, ILogger<BuildSnPLst> lo
             logger.LogError("Could not get S&P-500 URL for processing");
             return null;
         }
+        client.DefaultRequestHeaders.Add("User-Agent", "Chrome/111.0.0.0");
         var pageContent = await client.GetStringAsync(url);
         if (string.IsNullOrEmpty(pageContent))
         {
