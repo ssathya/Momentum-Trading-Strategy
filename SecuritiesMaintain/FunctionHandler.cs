@@ -34,7 +34,8 @@ internal class FunctionHandler
         {
             logger?.LogError("Could not generate object of type IManageSnPWeights");
             return null;
-        };
+        }
+        ;
         List<IndexComponent>? extractResult = await buildSnPLst.GetListAsync();
         List<IndexComponent>? extractResult2 = await buildNasdaqLst.GetListAsync();
         List<IndexComponent>? extractResult3 = await buildDowLst.GetListAsync();
@@ -47,6 +48,15 @@ internal class FunctionHandler
 
         MergeExtracts(extractResult, extractResult2, extractResult3);
         await indexWeights.UpdateIndexWeight(extractResult);
+        IAddSpecialETFs? addSpecialETFs = provider.GetService<IAddSpecialETFs>();
+        if (addSpecialETFs is not null)
+        {
+            extractResult = await addSpecialETFs.AddETFsAsync(extractResult);
+        }
+        else
+        {
+            logger?.LogWarning("Could not generate object of type IAddSpecialETFs");
+        }
         IIndexToDbService? indexToDbService = provider.GetService<IIndexToDbService>();
         if (indexToDbService is not null)
         {
@@ -100,9 +110,10 @@ internal class FunctionHandler
 
     private static void AppSpecificSettings(IServiceCollection services)
     {
-        services.AddScoped<IBuildSnPLst, BuildSnPLst>();
-        services.AddScoped<IBuildNasdaqLst, BuildNasdaqLst>();
+        services.AddScoped<IAddSpecialETFs, AddSpecialETFs>();
         services.AddScoped<IBuildDowLst, BuildDowLst>();
+        services.AddScoped<IBuildNasdaqLst, BuildNasdaqLst>();
+        services.AddScoped<IBuildSnPLst, BuildSnPLst>();
         services.AddScoped<IIndexToDbService, IndexToDbService>();
         services.AddScoped<IManageIndexWeights, ManageIndexWeights>();
     }

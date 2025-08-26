@@ -13,7 +13,7 @@ internal class ManageIndexWeights(IConfiguration configuration, ILogger<ManageIn
     private readonly HttpClient client = client;
     private const string nodesToProcess = """//div/div/table/tbody/tr""";
 
-    //                                    """/html/body/div[2]/div[2]/div[1]/div/div/table/tbody/tr"
+    // """/html/body/div[2]/div[2]/div[1]/div/div/table/tbody/tr"
     private const string tableData = @"td";
 
     private const string tableHeader = @"<th>";
@@ -33,7 +33,7 @@ internal class ManageIndexWeights(IConfiguration configuration, ILogger<ManageIn
             logger.LogError("SNPWeight url is null");
             return false;
         }
-        client.DefaultRequestHeaders.Add("User-Agent", "Other");
+        client.DefaultRequestHeaders.Add("User-Agent", "SecuritiesMaintain-1.0");
         bool updateResult = true;
         updateResult = await PopulateIndexValues(indices, IndexNames.SnP, snpWeightUrl);
         if (!updateResult)
