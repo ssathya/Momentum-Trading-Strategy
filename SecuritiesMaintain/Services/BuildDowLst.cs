@@ -26,6 +26,7 @@ internal class BuildDowLst(IConfiguration configuration, ILogger<BuildDowLst> lo
             logger.LogError("Could not get DOW30URL URL from configuration");
             return null;
         }
+        client.DefaultRequestHeaders.Add("User-Agent", "SecuritiesMaintain-1.0");
         var pageContent = await client.GetStringAsync(url);
         if (string.IsNullOrEmpty(pageContent))
         {

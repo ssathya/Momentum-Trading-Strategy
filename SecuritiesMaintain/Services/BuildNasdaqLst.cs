@@ -25,6 +25,7 @@ internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst>
             logger.LogError("Could not get NASDAQ100 URL from configuration");
             return null;
         }
+        client.DefaultRequestHeaders.Add("User-Agent", "SecuritiesMaintain-1.0");
         var pageContent = await client.GetStringAsync(url);
         if (string.IsNullOrEmpty(pageContent))
         {
