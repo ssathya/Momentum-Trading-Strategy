@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCore.BulkExtensions.PostgreSql" Version="8.1.1" />
-    <PackageReference Include="Skender.Stock.Indicators" Version="2.5.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="EFCore.BulkExtensions.PostgreSql" Version="10.0.0" />
+    <PackageReference Include="Skender.Stock.Indicators" Version="2.7.1" />
+    
   </ItemGroup>
 
   <ItemGroup>
