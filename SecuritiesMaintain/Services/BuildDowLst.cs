@@ -11,7 +11,7 @@ internal class BuildDowLst(IConfiguration configuration, ILogger<BuildDowLst> lo
 {
     private const string tableDataTag = ".//td";
     private const string tableHeaderTag = ".//th";
-    private const string tableRootNode = """//table[@class='wikitable sortable']""";
+    private const string tableRootNode = """//*[@id="constituents"]""";
     private const string tableRowTag = ".//tr";
     private readonly HttpClient client = client;
     private readonly IConfiguration configuration = configuration;
