@@ -24,17 +24,17 @@ internal class FunctionHandler
             , out IBuildSnPLst? buildSnPLst
             , out IBuildNasdaqLst? buildNasdaqLst
             , out IBuildDowLst? buildDowLst);
-        IManageIndexWeights? indexWeights = provider.GetService<IManageIndexWeights>();
+        //IManageIndexWeights? indexWeights = provider.GetService<IManageIndexWeights>();
         if (buildSnPLst is null || buildDowLst is null || buildNasdaqLst is null)
         {
             logger?.LogError("Could not generate object of type IBuildSnPLst or IBuildDowLst or IBuildNasdaqLst");
             return null;
         }
-        if (indexWeights is null)
-        {
-            logger?.LogError("Could not generate object of type IManageSnPWeights");
-            return null;
-        }
+        //if (indexWeights is null)
+        //{
+        //    logger?.LogError("Could not generate object of type IManageSnPWeights");
+        //    return null;
+        //}
         ;
         List<IndexComponent>? extractResult = await buildSnPLst.GetListAsync();
         List<IndexComponent>? extractResult2 = await buildNasdaqLst.GetListAsync();
@@ -47,7 +47,7 @@ internal class FunctionHandler
         }
 
         MergeExtracts(extractResult, extractResult2, extractResult3);
-        await indexWeights.UpdateIndexWeight(extractResult);
+        //await indexWeights.UpdateIndexWeight(extractResult);
         IAddSpecialETFs? addSpecialETFs = provider.GetService<IAddSpecialETFs>();
         if (addSpecialETFs is not null)
         {
@@ -115,6 +115,6 @@ internal class FunctionHandler
         services.AddScoped<IBuildNasdaqLst, BuildNasdaqLst>();
         services.AddScoped<IBuildSnPLst, BuildSnPLst>();
         services.AddScoped<IIndexToDbService, IndexToDbService>();
-        services.AddScoped<IManageIndexWeights, ManageIndexWeights>();
+        //services.AddScoped<IManageIndexWeights, ManageIndexWeights>();
     }
 }
