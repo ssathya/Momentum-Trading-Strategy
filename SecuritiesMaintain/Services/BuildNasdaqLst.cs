@@ -8,7 +8,7 @@ namespace SecuritiesMaintain.Services;
 internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst> logger, HttpClient client) : IBuildNasdaqLst
 {
     //private const string nodeEleToProcess = """//*[@id='constituents']/tbody/tr""";
-    private const string nodeEleToProcess = """//*/table[5]/tbody/tr""";
+    private const string nodeEleToProcess = """//*/table[6]/tbody/tr""";
 
     private const string tableDataTag = "td";
     private const string tableHeaderTag = "<th>";

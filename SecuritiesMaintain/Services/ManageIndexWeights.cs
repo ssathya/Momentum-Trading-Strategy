@@ -1,16 +1,22 @@
-﻿using HtmlAgilityPack;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Playwright;
 using Models;
 
 namespace SecuritiesMaintain.Services;
 
-internal class ManageIndexWeights(IConfiguration configuration, ILogger<ManageIndexWeights> logger, HttpClient client)
+internal class ManageIndexWeights(IConfiguration configuration
+    , ILogger<ManageIndexWeights> logger
+    //, HttpClient client
+    )
 : IManageIndexWeights
 {
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger<ManageIndexWeights> logger = logger;
-    private readonly HttpClient client = client;
+
+    // private readonly HttpClient client = client;
     private const string nodesToProcess = """//div/div/table/tbody/tr""";
 
     // """/html/body/div[2]/div[2]/div[1]/div/div/table/tbody/tr"
@@ -33,7 +39,7 @@ internal class ManageIndexWeights(IConfiguration configuration, ILogger<ManageIn
             logger.LogError("SNPWeight url is null");
             return false;
         }
-        client.DefaultRequestHeaders.Add("User-Agent", "SecuritiesMaintain-1.0");
+        //client.DefaultRequestHeaders.Add("User-Agent", "SecuritiesMaintain-1.0");
         bool updateResult = true;
         updateResult = await PopulateIndexValues(indices, IndexNames.SnP, snpWeightUrl);
         if (!updateResult)
@@ -57,7 +63,12 @@ internal class ManageIndexWeights(IConfiguration configuration, ILogger<ManageIn
 
     private async Task<bool> PopulateIndexValues(List<IndexComponent> indices, IndexNames indexName, string? weightURL)
     {
-        var pageContent = await client.GetStringAsync(weightURL);
+        using var playwright = await Playwright.CreateAsync();
+        var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
+        var page = await browser.NewPageAsync();
+        await page.GotoAsync(weightURL!, new() { WaitUntil = WaitUntilState.NetworkIdle });
+
+        var pageContent = await page.ContentAsync();
         if (string.IsNullOrEmpty(pageContent))
         {
             logger.LogError("SNPWeight pageContent is null");
