@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Models;
@@ -7,11 +7,10 @@ namespace SecuritiesMaintain.Services;
 
 internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst> logger, HttpClient client) : IBuildNasdaqLst
 {
-    //private const string nodeEleToProcess = """//*[@id='constituents']/tbody/tr""";
-    private const string nodeEleToProcess = """//*/table[6]/tbody/tr""";
+    private const string nodeEleToProcess = """//table[@id='constituents']//tr""";
 
     private const string tableDataTag = "td";
-    private const string tableHeaderTag = "<th>";
+    private const string tableHeaderTag = "th";
     private readonly HttpClient client = client;
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger<BuildSnPLst> logger = logger;
@@ -42,7 +41,7 @@ internal class BuildNasdaqLst(IConfiguration configuration, ILogger<BuildSnPLst>
         }
         foreach (var node in nodes)
         {
-            if (node.InnerHtml.Contains(tableHeaderTag, StringComparison.InvariantCultureIgnoreCase))
+            if (node.SelectSingleNode(tableHeaderTag) != null)
             {
                 logger.LogInformation($"Skipping row {node.InnerHtml}");
                 continue;

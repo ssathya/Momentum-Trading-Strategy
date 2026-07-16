@@ -8,8 +8,12 @@ namespace SecuritiesMaintain.Services;
 internal class BuildSnPLst(IConfiguration configuration, ILogger<BuildSnPLst> logger, HttpClient client) : IBuildSnPLst
 {
     private const string nodeEleToProcess = """//*[@id="constituents"]/tbody/tr""";
+
+    //private const string nodeEleToProcess1 = """//*[@id="constituents"]""";
     private const string tableData = @"td";
+
     private const string tableHeader = @"<th>";
+    private const string tableHeaderNew = """<th id=""";
     private readonly HttpClient client = client;
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger<BuildSnPLst> logger = logger;
@@ -40,7 +44,8 @@ internal class BuildSnPLst(IConfiguration configuration, ILogger<BuildSnPLst> lo
         }
         foreach (var node in nodes)
         {
-            if (node.InnerHtml.Contains(tableHeader, StringComparison.InvariantCultureIgnoreCase))
+            if (node.InnerHtml.Contains(tableHeader, StringComparison.InvariantCultureIgnoreCase) ||
+                node.InnerHtml.Contains(tableHeaderNew, StringComparison.InvariantCultureIgnoreCase))
             {
                 logger.LogInformation($"Skipping row {node.InnerHtml}");
                 continue;
