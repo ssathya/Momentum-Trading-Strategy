@@ -64,6 +64,7 @@ internal class BuildDowLst(IConfiguration configuration, ILogger<BuildDowLst> lo
             var ticker = cells[1].InnerText.Trim();
             //string wightStr = Regex.Replace(cells[5].InnerText.Trim(), "%", "");
             //_ = float.TryParse(wightStr, out float weight);
+            //DOW weight has been removed from the table as per new updates.
             IndexComponent ic = new()
             {
                 CompanyName = companyName,
