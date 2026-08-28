@@ -62,15 +62,15 @@ internal class BuildDowLst(IConfiguration configuration, ILogger<BuildDowLst> lo
             var companyCell = row.SelectSingleNode(tableHeaderTag);
             var companyName = companyCell?.InnerText.Trim();
             var ticker = cells[1].InnerText.Trim();
-            string wightStr = Regex.Replace(cells[5].InnerText.Trim(), "%", "");
-            _ = float.TryParse(wightStr, out float weight);
+            //string wightStr = Regex.Replace(cells[5].InnerText.Trim(), "%", "");
+            //_ = float.TryParse(wightStr, out float weight);
             IndexComponent ic = new()
             {
                 CompanyName = companyName,
                 Ticker = ticker,
                 Sector = string.Empty,
                 SubSector = string.Empty,
-                DowWeight = weight
+                DowWeight = 0
             };
             ic.ListedIndexes |= IndexNames.Dow;
             return ic;
